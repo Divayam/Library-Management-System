@@ -1,0 +1,9 @@
+streamlit
+supabase
+gotrue
+python-dotenv
+pydantic
+requests
+fastapi
+uvicorn
+pandas
