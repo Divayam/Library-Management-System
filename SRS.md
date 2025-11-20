@@ -348,60 +348,9 @@ graph TB
 
 ### 5.3 Component Interaction
 
-#### 5.3.1 User Action Flow
 
-```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#fff3e0', 'primaryTextColor':'#e65100', 'primaryBorderColor':'#ff9800', 'lineColor':'#ffb74d', 'secondaryColor':'#f1f8e9', 'tertiaryColor':'#fff9c4', 'background':'#ffffff', 'mainBkgColor':'#fafafa', 'textColor':'#212121', 'actorBkgColor':'#fff9c4', 'actorBorderColor':'#f9a825', 'actorTextColor':'#212121', 'activationBkgColor':'#fff3e0', 'activationBorderColor':'#ff9800'}}}%%
-sequenceDiagram
-    participant User
-    participant Frontend as Streamlit Frontend
-    participant Services as backend.services
-    participant DB as Supabase Client
-    participant Supabase as Supabase Database
-    
-    User->>Frontend: Interact with UI (click, submit)
-    Frontend->>Services: Call service function (e.g., get_books())
-    Services->>DB: Execute query via Supabase client
-    DB->>Supabase: SQL Query/API Request
-    Supabase-->>DB: JSON Response
-    DB-->>Services: Parsed data
-    Services-->>Frontend: Return data/list
-    Frontend->>Frontend: Convert to DataFrame
-    Frontend-->>User: Display in table/chart
-```
 
-#### 5.3.2 Authentication Flow
-
-```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#fff3e0', 'primaryTextColor':'#e65100', 'primaryBorderColor':'#ff9800', 'lineColor':'#ffb74d', 'secondaryColor':'#f1f8e9', 'tertiaryColor':'#fff9c4', 'background':'#ffffff', 'mainBkgColor':'#fafafa', 'textColor':'#212121', 'actorBkgColor':'#fff9c4', 'actorBorderColor':'#f9a825', 'actorTextColor':'#212121', 'activationBkgColor':'#fff3e0', 'activationBorderColor':'#ff9800'}}}%%
-sequenceDiagram
-    participant User
-    participant Login as Login Page
-    participant Auth as backend.auth
-    participant SupabaseAuth as Supabase Auth
-    participant Session as Session State
-    participant Admin as Admin Pages
-    
-    User->>Login: Enter email/password
-    Login->>Auth: sign_in(email, password)
-    Auth->>SupabaseAuth: Validate credentials
-    alt Valid Credentials
-        SupabaseAuth-->>Auth: User + Session tokens
-        Auth-->>Login: Serialized user/session
-        Login->>Session: Store in st.session_state
-        Login-->>User: Success message
-        User->>Admin: Navigate to admin page
-        Admin->>Session: Check supabase_user
-        Session-->>Admin: User authenticated
-        Admin-->>User: Render page content
-    else Invalid Credentials
-        SupabaseAuth-->>Auth: Error
-        Auth-->>Login: Error message
-        Login-->>User: Display error
-    end
-```
-
-#### 5.3.3 Borrow/Return Workflow
+#### 5.3.1 Borrow/Return Workflow
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#e8f5e9', 'primaryTextColor':'#2e7d32', 'primaryBorderColor':'#4caf50', 'lineColor':'#66bb6a', 'secondaryColor':'#f1f8e9', 'tertiaryColor':'#fff9c4', 'background':'#ffffff', 'mainBkgColor':'#f5f5f5', 'textColor':'#212121', 'primaryTextColor':'#1b5e20', 'noteBkgColor':'#fff9c4', 'noteTextColor':'#212121', 'noteBorderColor':'#f9a825'}}}%%
@@ -430,7 +379,7 @@ flowchart TD
     SetToTotal --> Success2
 ```
 
-#### 5.3.4 Complete System Data Flow
+#### 5.3.2 Complete System Data Flow
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#e3f2fd', 'primaryTextColor':'#1565c0', 'primaryBorderColor':'#42a5f5', 'lineColor':'#64b5f6', 'secondaryColor':'#f1f8e9', 'tertiaryColor':'#fff9c4', 'background':'#ffffff', 'mainBkgColor':'#fafafa', 'textColor':'#212121'}}}%%
@@ -752,40 +701,6 @@ Status codes: 400 (Bad Request), 404 (Not Found), 500 (Internal Server Error)
 - **Configuration**: All origins allowed (`*`)
 - **Methods**: All methods allowed
 - **Headers**: All headers allowed
-
-### 8.4 API Request/Response Flow
-
-```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#fff3e0', 'primaryTextColor':'#e65100', 'primaryBorderColor':'#ff9800', 'lineColor':'#ffb74d', 'secondaryColor':'#f1f8e9', 'tertiaryColor':'#fff9c4', 'background':'#ffffff', 'mainBkgColor':'#fafafa', 'textColor':'#212121', 'actorBkgColor':'#fff9c4', 'actorBorderColor':'#f9a825', 'actorTextColor':'#212121', 'activationBkgColor':'#fff3e0', 'activationBorderColor':'#ff9800', 'noteBkgColor':'#fff9c4', 'noteTextColor':'#212121', 'noteBorderColor':'#f9a825'}}}%%
-sequenceDiagram
-    participant Client
-    participant FastAPI as FastAPI Server
-    participant Services as Backend Services
-    participant Supabase as Supabase Database
-    
-    Note over Client,Supabase: Example: Borrow Book Request
-    
-    Client->>FastAPI: POST /borrow<br/>{student_id, book_id}
-    FastAPI->>FastAPI: Validate payload (Pydantic)
-    alt Invalid Payload
-        FastAPI-->>Client: 400 Bad Request<br/>{detail: "validation error"}
-    else Valid Payload
-        FastAPI->>Services: borrow_book(student_id, book_id)
-        Services->>Services: Validate student exists
-        Services->>Services: Validate book exists
-        Services->>Services: Check available_copies > 0
-        alt Validation Failed
-            Services-->>FastAPI: {success: false, error: "..."}
-            FastAPI-->>Client: 400 Bad Request<br/>{detail: "error message"}
-        else Validation Passed
-            Services->>Supabase: INSERT borrow_records
-            Services->>Supabase: UPDATE books (decrement)
-            Supabase-->>Services: Success
-            Services-->>FastAPI: {success: true, message: "..."}
-            FastAPI-->>Client: 201 Created<br/>{success: true, message: "..."}
-        end
-    end
-```
 
 ---
 
