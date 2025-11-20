@@ -1,0 +1,40 @@
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+
+# Virtual environment
+venv/
+.env/
+.env.local
+
+# --- Streamlit ---
+.streamlit/secrets.toml
+
+# --- Supabase ---
+supabase/.temp/
+supabase/.branches/
+supabase/.migrations/
+supabase/.env
+.supabase
+
+# --- Logs ---
+*.log
+logs/
+
+# --- IDE / Editor ---
+.vscode/
+.idea/
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
+
+# --- Build / Cache ---
+dist/
+build/
+*.egg-info/
+*.egg
+.cache/
